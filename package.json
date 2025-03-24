@@ -2,6 +2,9 @@
   "name": "@notionpresso/api-sdk",
   "version": "0.0.1",
   "description": "",
+  "main": "./package/index.js",
+  "module": "./package/index.js",
+  "types": "./package/index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync": "tsc --build .",
@@ -23,10 +26,9 @@
     "typescript": "^4.9.4"
   },
   "dependencies": {
-    "@notionhq/client": "^2.2.3"
+    "@notionhq/client": "^2.2.3",
+    "@types/cheerio": "^0.22.35",
+    "cheerio": "1.0.0-rc.12"
   },
-  "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  }
+  "type": "module"
 }
