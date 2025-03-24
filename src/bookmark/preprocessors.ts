@@ -1,5 +1,6 @@
 import { cleanWhitespace, extractDomain, stripHtml } from './utils.js';
 import { transformBookmarkBlock } from './transform.js';
+import { Block } from '../index.js';
 
 interface PreprocessorFn {
   (value: string): string;
@@ -27,7 +28,9 @@ export function applyPreprocessors(
 
   const keysToProcess = fields
     ? Object.keys(metadata).filter(key => fields.includes(key))
-    : Object.keys(metadata).filter(key => DEFAULT_BOOKMARK_FIELDS.includes(key as any));
+    : Object.keys(metadata).filter(key =>
+        DEFAULT_BOOKMARK_FIELDS.includes(key as (typeof DEFAULT_BOOKMARK_FIELDS)[number])
+      );
 
   for (const key of keysToProcess) {
     const value = metadata[key];
@@ -42,15 +45,15 @@ export function applyPreprocessors(
 }
 
 export async function processBlocks(
-  blocks: any[],
+  blocks: Block[],
   options: {
     meta?: boolean;
     fields?: string[];
   } = {}
-): Promise<any[]> {
+): Promise<Block[]> {
   const preprocessors = { ...defaultPreprocessors };
 
-  async function processBlocksRecursively(blocks: any[]): Promise<any[]> {
+  async function processBlocksRecursively(blocks: Block[]): Promise<Block[]> {
     const results = [];
 
     for (const block of blocks) {
