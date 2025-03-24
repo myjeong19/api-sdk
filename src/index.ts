@@ -1,11 +1,13 @@
-import {Client as _Client} from "@notionhq/client";
-import type {ClientOptions} from "@notionhq/client/build/src/Client";
+import { Client as _Client } from '@notionhq/client';
+import type { ClientOptions } from '@notionhq/client/build/src/Client';
 import {
   BlockObjectResponse,
   PageObjectResponse,
   QueryDatabaseParameters,
   QueryDatabaseResponse,
-} from "@notionhq/client/build/src/api-endpoints";
+} from '@notionhq/client/build/src/api-endpoints';
+
+import { processTwitterEmbeds } from './embed/tweet';
 
 export class Client extends _Client {
   constructor(options: ClientOptions = {}) {
@@ -32,13 +34,13 @@ export class Client extends _Client {
       } while (cursor);
     }
 
-    const result = (await Promise.all(
-      (blocks as BlockObjectResponse[]).map(async (block) => {
-        if (block.has_children) {
+    blocks = processTwitterEmbeds(blocks);
 
+    const result = (await Promise.all(
+      (blocks as BlockObjectResponse[]).map(async block => {
+        if (block.has_children) {
           const blockId =
-            block.type === "synced_block" &&
-            block.synced_block.synced_from != null
+            block.type === 'synced_block' && block.synced_block.synced_from != null
               ? block.synced_block.synced_from.block_id
               : block.id;
 
@@ -65,8 +67,13 @@ export class Client extends _Client {
   async fetchPageListFromDatabase(params: QueryDatabaseParameters): Promise<QueryDatabaseResults> {
     const response = await this.databases.query(params);
     const result = [...response.results];
-    if (response.has_more) {
-      const nextParams = {...params, database_id: response.next_cursor};
+    if (response.has_more && response.next_cursor) {
+      const { database_id, ...restParams } = params;
+      const nextParams = {
+        database_id: database_id as string,
+        ...restParams,
+        start_cursor: response.next_cursor,
+      };
       const nextResult = await this.fetchPageListFromDatabase(nextParams);
       result.push(...nextResult);
     }
