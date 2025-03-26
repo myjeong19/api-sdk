@@ -22,7 +22,7 @@ export interface OEmbedResponse {
 }
 
 export interface NotionpressoTweetBlock {
-  type: 'notionpresso_tweet';
+  type: "notionpresso_tweet";
   notionpresso_tweet: {
     url: string;
     iframe_url: string;
