@@ -1,20 +1,26 @@
-import { cleanWhitespace, extractDomain, stripHtml } from './utils.js';
-import { transformBookmarkBlock } from './transform.js';
-import { Block } from '../index.js';
+import { cleanWhitespace, extractDomain, stripHtml } from "./utils.js";
+import { transformBookmarkBlock } from "./transform.js";
+import { Block } from "../index.js";
 
 interface PreprocessorFn {
   (value: string): string;
 }
 
-export const DEFAULT_BOOKMARK_FIELDS = ['title', 'url', 'description', 'favicon', 'image'] as const;
+export const DEFAULT_BOOKMARK_FIELDS = [
+  "title",
+  "url",
+  "description",
+  "favicon",
+  "image",
+] as const;
 
 export const defaultPreprocessors: Record<string, PreprocessorFn> = {
-  title: value => cleanWhitespace(stripHtml(value)),
-  description: value => cleanWhitespace(stripHtml(value)),
-  image: value => value.trim(),
-  favicon: value => value.trim(),
-  site_name: value => cleanWhitespace(value),
-  url: value => value.trim(),
+  title: (value) => cleanWhitespace(stripHtml(value)),
+  description: (value) => cleanWhitespace(stripHtml(value)),
+  image: (value) => value.trim(),
+  favicon: (value) => value.trim(),
+  site_name: (value) => cleanWhitespace(value),
+  url: (value) => value.trim(),
   domain: extractDomain,
   author: cleanWhitespace,
 };
@@ -27,9 +33,11 @@ export function applyPreprocessors(
   const processed: Record<string, string> = {};
 
   const keysToProcess = fields
-    ? Object.keys(metadata).filter(key => fields.includes(key))
-    : Object.keys(metadata).filter(key =>
-        DEFAULT_BOOKMARK_FIELDS.includes(key as (typeof DEFAULT_BOOKMARK_FIELDS)[number])
+    ? Object.keys(metadata).filter((key) => fields.includes(key))
+    : Object.keys(metadata).filter((key) =>
+        DEFAULT_BOOKMARK_FIELDS.includes(
+          key as (typeof DEFAULT_BOOKMARK_FIELDS)[number]
+        )
       );
 
   for (const key of keysToProcess) {
@@ -64,7 +72,9 @@ export async function processBlocks(
       });
 
       if (processedBlock.blocks) {
-        processedBlock.blocks = await processBlocksRecursively(processedBlock.blocks);
+        processedBlock.blocks = await processBlocksRecursively(
+          processedBlock.blocks
+        );
       }
 
       results.push(processedBlock);

@@ -1,4 +1,4 @@
-import * as cheerio from 'cheerio';
+import * as cheerio from "cheerio";
 
 function extractDomainFromUrl(url: string): string {
   try {
@@ -9,20 +9,22 @@ function extractDomainFromUrl(url: string): string {
 }
 
 function extractTitleFromHtml(cheerioHTML: cheerio.Root): string | undefined {
-  const title = cheerioHTML('title').text().trim();
+  const title = cheerioHTML("title").text().trim();
   return title || undefined;
 }
 
-function extractMetaTagsFromHtml(cheerioHTML: cheerio.Root): Record<string, string> {
+function extractMetaTagsFromHtml(
+  cheerioHTML: cheerio.Root
+): Record<string, string> {
   const metaTags: Record<string, string> = {};
 
-  cheerioHTML('meta').each((_, element) => {
+  cheerioHTML("meta").each((_, element) => {
     const meta = cheerioHTML(element);
-    const name = meta.attr('name') || meta.attr('property');
-    const content = meta.attr('content');
+    const name = meta.attr("name") || meta.attr("property");
+    const content = meta.attr("content");
 
     if (name && content) {
-      const key = name.replace(/^(og:|twitter:)/, '');
+      const key = name.replace(/^(og:|twitter:)/, "");
       metaTags[key] = content;
     }
   });
@@ -30,7 +32,10 @@ function extractMetaTagsFromHtml(cheerioHTML: cheerio.Root): Record<string, stri
   return metaTags;
 }
 
-function extractFaviconFromHtml(cheerioHTML: cheerio.Root, url: string): string {
+function extractFaviconFromHtml(
+  cheerioHTML: cheerio.Root,
+  url: string
+): string {
   try {
     const baseUrl = new URL(url);
     const origin = baseUrl.origin;
@@ -39,11 +44,11 @@ function extractFaviconFromHtml(cheerioHTML: cheerio.Root, url: string): string 
       'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]'
     );
     if (iconLinks.length > 0) {
-      const faviconUrl = cheerioHTML(iconLinks[0]).attr('href');
+      const faviconUrl = cheerioHTML(iconLinks[0]).attr("href");
       if (faviconUrl) {
-        if (faviconUrl.startsWith('/')) {
+        if (faviconUrl.startsWith("/")) {
           return `${origin}${faviconUrl}`;
-        } else if (!faviconUrl.startsWith('http')) {
+        } else if (!faviconUrl.startsWith("http")) {
           return `${origin}/${faviconUrl}`;
         }
         return faviconUrl;
@@ -57,25 +62,30 @@ function extractFaviconFromHtml(cheerioHTML: cheerio.Root, url: string): string 
 }
 
 function findLargeImageInHtml(cheerioHTML: cheerio.Root): string | undefined {
-  const largeImages = cheerioHTML('img').filter((_, img) => {
-    const width = parseInt(cheerioHTML(img).attr('width') || '0', 10);
-    const height = parseInt(cheerioHTML(img).attr('height') || '0', 10);
+  const largeImages = cheerioHTML("img").filter((_, img) => {
+    const width = parseInt(cheerioHTML(img).attr("width") || "0", 10);
+    const height = parseInt(cheerioHTML(img).attr("height") || "0", 10);
     return width > 200 && height > 200;
   });
 
   if (largeImages.length > 0) {
-    return cheerioHTML(largeImages[0]).attr('src') || undefined;
+    return cheerioHTML(largeImages[0]).attr("src") || undefined;
   }
 
   return undefined;
 }
 
-function extractFirstParagraphFromHtml(cheerioHTML: cheerio.Root): string | undefined {
-  const firstParagraph = cheerioHTML('p').first().text().trim();
+function extractFirstParagraphFromHtml(
+  cheerioHTML: cheerio.Root
+): string | undefined {
+  const firstParagraph = cheerioHTML("p").first().text().trim();
   return firstParagraph || undefined;
 }
 
-export async function extractMetadata(html: string, url?: string): Promise<Record<string, string>> {
+export async function extractMetadata(
+  html: string,
+  url?: string
+): Promise<Record<string, string>> {
   const cheerioHTML = cheerio.load(html);
   const metadata: Record<string, string> = {};
 

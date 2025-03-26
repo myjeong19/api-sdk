@@ -2,7 +2,7 @@ export async function fetchUrl(url: string): Promise<string> {
   try {
     const response = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; NotionDump/1.0)',
+        "User-Agent": "Mozilla/5.0 (compatible; NotionDump/1.0)",
       },
     });
 

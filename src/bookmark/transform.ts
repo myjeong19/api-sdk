@@ -1,8 +1,11 @@
-import type { NotionpressoBookmarkBlock } from './types.js';
-import { DEFAULT_BOOKMARK_FIELDS, applyPreprocessors } from './preprocessors.js';
-import { fetchUrl } from './fetch.js';
-import { extractMetadata } from './metadata.js';
-import type { Block } from '../index.js';
+import type { NotionpressoBookmarkBlock } from "./types.js";
+import {
+  DEFAULT_BOOKMARK_FIELDS,
+  applyPreprocessors,
+} from "./preprocessors.js";
+import { fetchUrl } from "./fetch.js";
+import { extractMetadata } from "./metadata.js";
+import type { Block } from "../index.js";
 
 interface OriginalBookmark {
   url: string;
@@ -20,8 +23,10 @@ function createBookmarkBlock(
   caption: Array<unknown>,
   error?: string
 ): NotionpressoBookmarkBlock {
-  const newBlock = JSON.parse(JSON.stringify(originalBlock)) as NotionpressoBookmarkBlock;
-  newBlock.type = 'notionpresso_bookmark';
+  const newBlock = JSON.parse(
+    JSON.stringify(originalBlock)
+  ) as NotionpressoBookmarkBlock;
+  newBlock.type = "notionpresso_bookmark";
 
   newBlock.notionpresso_bookmark = {
     metadata,
@@ -35,12 +40,13 @@ function createBookmarkBlock(
   return newBlock;
 }
 
-export function setBasicMetadata(originalBookmark: OriginalBookmark): Record<string, string> {
+export function setBasicMetadata(
+  originalBookmark: OriginalBookmark
+): Record<string, string> {
   return Object.fromEntries(
-    DEFAULT_BOOKMARK_FIELDS.filter(field => originalBookmark[field] !== undefined).map(field => [
-      field,
-      originalBookmark[field] as string,
-    ])
+    DEFAULT_BOOKMARK_FIELDS.filter(
+      (field) => originalBookmark[field] !== undefined
+    ).map((field) => [field, originalBookmark[field] as string])
   );
 }
 
@@ -52,7 +58,7 @@ export async function transformBookmarkBlock(
     fields?: string[];
   } = {}
 ): Promise<NotionpressoBookmarkBlock | Block> {
-  if (block.type !== 'bookmark') {
+  if (block.type !== "bookmark") {
     return block;
   }
 
@@ -66,7 +72,11 @@ export async function transformBookmarkBlock(
   try {
     const html = await fetchUrl(originalBookmark.url);
     const metadata = await extractMetadata(html, originalBookmark.url);
-    const processed = applyPreprocessors(metadata, options.preprocessors, options.fields);
+    const processed = applyPreprocessors(
+      metadata,
+      options.preprocessors,
+      options.fields
+    );
 
     return createBookmarkBlock(block, processed, originalBookmark.caption);
   } catch (error) {
